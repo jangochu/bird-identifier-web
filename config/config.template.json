@@ -1,7 +1,7 @@
 {
   "_comment": "配置文件说明：复制本文件为 config.json，然后填入你的真实 API Key",
   
-  "ALI_API_KEY": "这里填入你自己的阿里云百炼APIKEY",
+  "ALI_API_KEY": "your-ali-api-key-here",
   
   "MODEL": "qwen-vl-max",
   
