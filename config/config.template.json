@@ -1,0 +1,16 @@
+{
+  "_comment": "配置文件说明：复制本文件为 config.json，然后填入你的真实 API Key",
+  
+  "ALI_API_KEY": "这里填入你自己的阿里云百炼APIKEY",
+  
+  "MODEL": "qwen-vl-max",
+  
+  "_model_options": {
+    "description": "可选模型",
+    "options": [
+      "qwen-vl-max - 视觉理解能力最强",
+      "qwen-vl-plus - 性价比高，速度快",
+      "qwen3-vl-plus - 最新一代模型"
+    ]
+  }
+}

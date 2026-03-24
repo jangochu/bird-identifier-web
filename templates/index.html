@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐦 鸟类识别</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🐦 鸟类识别</h1>
+            <p class="subtitle">上传照片，AI 帮你识别是什么鸟</p>
+        </header>
+
+        <main class="main-content">
+            <!-- 上传区域 -->
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📷</div>
+                    <p class="upload-text">点击或拖拽上传鸟类照片</p>
+                    <p class="upload-hint">支持 JPG、PNG 格式</p>
+                    <input type="file" id="fileInput" accept="image/*" hidden>
+                </div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section" id="previewSection" style="display: none;">
+                <div class="preview-container">
+                    <img id="previewImage" src="" alt="预览">
+                </div>
+                <div class="preview-actions">
+                    <button class="btn btn-secondary" id="reselectBtn">重新选择</button>
+                    <button class="btn btn-primary" id="identifyBtn">
+                        <span class="btn-text">开始识别</span>
+                        <span class="btn-loading" style="display: none;">识别中...</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 加载状态 -->
+            <div class="loading-section" id="loadingSection" style="display: none;">
+                <div class="spinner"></div>
+                <p>正在识别中，请稍候...</p>
+            </div>
+
+            <!-- 错误提示 -->
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+
+            <!-- 结果区域 -->
+            <div class="result-section" id="resultSection" style="display: none;">
+                <div class="result-image">
+                    <img id="resultImage" src="" alt="识别图片">
+                </div>
+
+                <div class="mock-notice" id="mockNotice" style="display: none;">
+                    <span class="mock-icon">⚠️</span>
+                    <div class="mock-content">
+                        <strong>当前为模拟数据</strong>
+                        <span>配置阿里云百炼 API Key 后可获得真实识别结果</span>
+                    </div>
+                </div>
+
+                <div class="result-content">
+                    <h2>🎯 识别结果</h2>
+                    
+                    <div class="description" id="description" style="display: none;"></div>
+
+                    <div class="result-list" id="resultList"></div>
+                </div>
+
+                <div class="result-actions">
+                    <button class="btn btn-primary btn-full" id="tryAgainBtn">再试一张</button>
+                </div>
+            </div>
+
+            <!-- 使用提示 -->
+            <div class="tips-section" id="tipsSection">
+                <h3>💡 使用提示</h3>
+                <ul>
+                    <li>请确保鸟类在照片中清晰可见</li>
+                    <li>尽量拍摄鸟类的正面或侧面</li>
+                    <li>避免逆光或过度模糊的照片</li>
+                    <li>照片越小，识别速度越快</li>
+                </ul>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>Powered by 阿里云百炼 qwen-vl</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
