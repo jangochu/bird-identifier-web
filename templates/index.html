@@ -14,6 +14,43 @@
         </header>
 
         <main class="main-content">
+            <!-- 地区选择器 -->
+            <div class="location-section" id="locationSection">
+                <h3 class="location-title">📍 选择观察地区（可选）</h3>
+                <p class="location-subtitle">选择地区可提高识别准确率，部分鸟类具有地域分布特征</p>
+                <div class="location-selectors">
+                    <div class="select-group">
+                        <label for="countrySelect">国家/地区</label>
+                        <select id="countrySelect" class="location-select">
+                            <option value="">-- 请选择国家 --</option>
+                            <option value="CN" selected>中国</option>
+                            <option value="JP">日本</option>
+                            <option value="KR">韩国</option>
+                            <option value="IN">印度</option>
+                            <option value="TH">泰国</option>
+                            <option value="VN">越南</option>
+                            <option value="MY">马来西亚</option>
+                            <option value="PH">菲律宾</option>
+                            <option value="ID">印度尼西亚</option>
+                            <option value="AU">澳大利亚</option>
+                            <option value="NZ">新西兰</option>
+                            <option value="US">美国</option>
+                            <option value="CA">加拿大</option>
+                            <option value="GB">英国</option>
+                            <option value="DE">德国</option>
+                            <option value="FR">法国</option>
+                            <option value="OTHER">其他</option>
+                        </select>
+                    </div>
+                    <div class="select-group">
+                        <label for="provinceSelect">省份/州</label>
+                        <select id="provinceSelect" class="location-select">
+                            <option value="">-- 请先选择国家 --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <!-- 上传区域 -->
             <div class="upload-section" id="uploadSection">
                 <div class="upload-area" id="uploadArea">

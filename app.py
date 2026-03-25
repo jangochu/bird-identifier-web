@@ -36,35 +36,71 @@ FALLBACK_MODEL = 'qwen-vl-plus'
 BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions'
 
 
-def identify_bird(image_base64):
+def identify_bird(image_base64, location=None):
     """
     调用阿里云百炼视觉模型识别鸟类
+    
+    Args:
+        image_base64: 图片的base64编码
+        location: 地区信息，包含国家和省份
     """
     if not ALI_API_KEY or ALI_API_KEY == 'your-ali-api-key-here':
         print('未配置阿里云百炼 API，返回模拟数据')
-        return mock_identify_result()
+        return mock_identify_result(location)
     
     try:
-        result = call_vision_model(image_base64, MODEL)
+        result = call_vision_model(image_base64, MODEL, location)
         return result
     except Exception as e:
         print(f'主模型调用失败: {e}，尝试备用模型')
         try:
-            result = call_vision_model(image_base64, FALLBACK_MODEL)
+            result = call_vision_model(image_base64, FALLBACK_MODEL, location)
             return result
         except Exception as fallback_error:
             print(f'备用模型也失败: {fallback_error}')
-            return mock_identify_result()
+            return mock_identify_result(location)
 
 
-def call_vision_model(image_base64, model):
+def call_vision_model(image_base64, model, location=None):
     """
     调用阿里云百炼视觉模型
+    
+    Args:
+        image_base64: 图片的base64编码
+        model: 模型名称
+        location: 地区信息，包含国家和省份
     """
     headers = {
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {ALI_API_KEY}'
     }
+    
+    # 构建地区提示信息
+    location_hint = ""
+    if location:
+        country = location.get('country', {}).get('name', '')
+        province = location.get('province', {}).get('name', '') if location.get('province') else ''
+        if country and province:
+            location_hint = f"这张照片拍摄于{country}{province}。请结合该地区的鸟类分布特征进行识别。"
+        elif country:
+            location_hint = f"这张照片拍摄于{country}。请结合该地区的鸟类分布特征进行识别。"
+    
+    prompt_text = '''这是一张什么鸟的照片？请识别这只鸟的种类，并返回以下格式的 JSON 数据（只返回 JSON，不要其他文字）：
+{
+  "bird_name": "鸟的中文名称",
+  "scientific_name": "拉丁学名（如果有）",
+  "confidence": 0.95,
+  "description": "简要描述特征",
+  "possible_species": [
+    {"name": "最可能的鸟种", "confidence": 0.95},
+    {"name": "次可能的鸟种", "confidence": 0.65},
+    {"name": "第三可能的鸟种", "confidence": 0.30}
+  ]
+}'''
+    
+    # 如果有地区信息，添加到提示中
+    if location_hint:
+        prompt_text = location_hint + "\n\n" + prompt_text
     
     data = {
         'model': model,
@@ -80,18 +116,7 @@ def call_vision_model(image_base64, model):
                     },
                     {
                         'type': 'text',
-                        'text': '''这是一张什么鸟的照片？请识别这只鸟的种类，并返回以下格式的 JSON 数据（只返回 JSON，不要其他文字）：
-{
-  "bird_name": "鸟的中文名称",
-  "scientific_name": "拉丁学名（如果有）",
-  "confidence": 0.95,
-  "description": "简要描述特征",
-  "possible_species": [
-    {"name": "最可能的鸟种", "confidence": 0.95},
-    {"name": "次可能的鸟种", "confidence": 0.65},
-    {"name": "第三可能的鸟种", "confidence": 0.30}
-  ]
-}'''
+                        'text': prompt_text
                     }
                 ]
             }
@@ -165,24 +190,82 @@ def parse_ai_response(content):
         }
 
 
-def mock_identify_result():
+def mock_identify_result(location=None):
     """
     模拟识别结果（用于开发和测试）
+    
+    Args:
+        location: 地区信息，用于返回地区相关的模拟数据
     """
     import random
-    mock_birds = [
+    
+    # 根据地区返回不同的模拟数据
+    country = location.get('country', {}).get('name', '') if location else ''
+    province = location.get('province', {}).get('name', '') if location and location.get('province') else ''
+    
+    # 中国常见鸟类
+    china_birds = [
         {'name': '麻雀', 'score': 0.95},
         {'name': '喜鹊', 'score': 0.82},
         {'name': '白头鹎', 'score': 0.67},
         {'name': '珠颈斑鸠', 'score': 0.45},
-        {'name': '乌鸫', 'score': 0.23}
+        {'name': '乌鸫', 'score': 0.23},
+        {'name': '家燕', 'score': 0.78},
+        {'name': '灰喜鹊', 'score': 0.56},
+        {'name': '大山雀', 'score': 0.43}
     ]
     
+    # 日本常见鸟类
+    japan_birds = [
+        {'name': '日本树莺', 'score': 0.92},
+        {'name': '绿绣眼', 'score': 0.85},
+        {'name': '灰椋鸟', 'score': 0.71},
+        {'name': '日本山雀', 'score': 0.58},
+        {'name': '丹顶鹤', 'score': 0.44}
+    ]
+    
+    # 澳大利亚常见鸟类
+    australia_birds = [
+        {'name': '笑翠鸟', 'score': 0.94},
+        {'name': '彩虹吸蜜鹦鹉', 'score': 0.81},
+        {'name': '澳洲喜鹊', 'score': 0.69},
+        {'name': '葵花凤头鹦鹉', 'score': 0.52},
+        {'name': '琴鸟', 'score': 0.38}
+    ]
+    
+    # 美国常见鸟类
+    us_birds = [
+        {'name': '北美红雀', 'score': 0.93},
+        {'name': '蓝松鸦', 'score': 0.79},
+        {'name': '旅鸫', 'score': 0.66},
+        {'name': '黑顶山雀', 'score': 0.48},
+        {'name': '金翅雀', 'score': 0.35}
+    ]
+    
+    # 根据地区选择鸟类列表
+    if '日本' in country:
+        mock_birds = japan_birds
+    elif '澳大利亚' in country or '澳洲' in country:
+        mock_birds = australia_birds
+    elif '美国' in country or '美國' in country:
+        mock_birds = us_birds
+    else:
+        mock_birds = china_birds
+    
     random.shuffle(mock_birds)
+    
+    # 构建描述信息
+    location_info = ""
+    if country and province:
+        location_info = f"（基于{country}{province}的鸟类分布）"
+    elif country:
+        location_info = f"（基于{country}的鸟类分布）"
+    
     return {
         'result': mock_birds[:3],
-        'description': '这是模拟数据，请配置阿里云百炼 API Key 以获得真实识别结果',
-        'isMock': True
+        'description': f'这是模拟数据{location_info}，请配置阿里云百炼 API Key 以获得真实识别结果',
+        'isMock': True,
+        'location': location
     }
 
 
@@ -208,6 +291,15 @@ def api_identify():
         image_data = file.read()
         image_base64 = base64.b64encode(image_data).decode('utf-8')
         
+        # 获取地区信息
+        location = None
+        if 'location' in request.form:
+            try:
+                location = json.loads(request.form['location'])
+                print(f'识别地区: {location}')
+            except json.JSONDecodeError:
+                print('地区信息解析失败')
+        
         # 保存上传的图片（可选，用于调试）
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
         filename = f"upload_{timestamp}.jpg"
@@ -216,7 +308,7 @@ def api_identify():
             f.write(image_data)
         
         # 调用识别
-        result = identify_bird(image_base64)
+        result = identify_bird(image_base64, location)
         result['image_url'] = f'/static/uploads/{filename}'
         
         return jsonify(result)
