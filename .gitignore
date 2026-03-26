@@ -43,4 +43,4 @@ Thumbs.db
 
 # 日志
 *.log
-.qoder/skills/odps-sql-executor/package.json
+.qoder/*
